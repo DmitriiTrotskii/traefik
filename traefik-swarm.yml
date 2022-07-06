@@ -1,0 +1,58 @@
+version: "3.9"
+
+services:
+  traefik:
+    image: traefik:v2.8
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+          - node.lable.traefik == true
+      update_config:
+        parallelism: 1
+        delay: 40s
+        order: start-first
+        failure_action: rollback
+      rollback_config:
+        parallelism: 0
+        order: stop-first
+      restart_policy:
+        condition: any
+        delay: 3s
+        window: 30s
+      labels:
+        - traefik.enable=true
+        - traefik.docker.network=traefik-network
+        - traefik.http.routers.traefik.entrypoints=https
+        - traefik.http.routers.traefik.rule=Host(`${FQDN}`)
+        - traefik.http.routers.traefik.service=api@internal
+        - traefik.http.routers.traefik.tls=true
+        - traefik.http.routers.traefik.tls.certresolver=letsencrypt
+        - traefik.http.services.traefik.loadbalancer.server.port=8080
+    healthcheck:
+      test: ["CMD", "wget", "-c", "http://localhost:8888/ping"]
+      interval: 2s
+      timeout: 1s
+      retries: 3
+    networks:
+      - traefik-network
+    ports:
+      - mode: global
+        published: 80
+        target: 80
+      - mode: global
+        published: 443
+        target: 443
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /mnt/swarm-data/traefik/configs:/etc/traefik:ro
+      - traefik_certificates:/var/traefik/certificates
+
+networks:
+  traefik-network:
+    external: true
+    
+volumes:
+  traefik_certificates:

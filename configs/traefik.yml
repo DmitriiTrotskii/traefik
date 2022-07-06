@@ -1,0 +1,57 @@
+api:
+  dashboard: true
+
+log:
+  level: error
+
+accessLog: {}
+
+metrics:
+  prometheus:
+    addRoutersLabels: true
+    addServicesLabels: true
+    buckets:
+      - 0.1
+      - 0.3
+      - 1.2
+      - 5.0
+
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      email: ${EMAIL}
+      storage: "/var/traefik/certificates/acme.json"
+      # caServer: "https://acme-v02.api.letsencrypt.org/directory"
+      # caServer: "https://acme-staging-v02.api.letsencrypt.org/directory"
+      tlsChallenge: true
+
+entryPoints:
+  ping:
+    address: ":8888"
+  http:
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: "https"
+          scheme: "https"
+  https:
+    address: ":443"
+
+global:
+  checknewversion: false
+  sendanonymoususage: false
+
+providers:
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+    exposedByDefault: false
+    network: "traefik-network"
+    swarmmode: true
+    watch: true
+  file:
+    directory: /etc/traefik
+    watch: true
+
+ping:
+  entryPoint: "ping"
