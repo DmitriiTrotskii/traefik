@@ -25,10 +25,12 @@ services:
         - traefik.enable=true
         - traefik.docker.network=traefik-network
         - traefik.http.routers.traefik.entrypoints=https
+        - traefik.http.routers.traefik.middlewares=defaultAuth@file,default@file
         - traefik.http.routers.traefik.rule=Host(`${FQDN}`)
         - traefik.http.routers.traefik.service=api@internal
         - traefik.http.routers.traefik.tls=true
         - traefik.http.routers.traefik.tls.certresolver=letsencrypt
+        - traefik.http.routers.traefik.tls.options=modern@file
         - traefik.http.services.traefik.loadbalancer.server.port=8080
     healthcheck:
       test: ["CMD", "wget", "-c", "http://localhost:8888/ping"]
