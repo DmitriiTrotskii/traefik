@@ -1,0 +1,20 @@
+http:
+  routers:
+    metrics-router:
+      entryPoints:
+      - https
+      service: metrics
+      rule: Host(`metrics.DOMAIN`)
+      middlewares:
+        - default@file
+        - defaultAuth@file
+      tls:
+        certResolver: letsencrypt
+        options:
+          modern@file
+  services:
+    metrics:
+      loadBalancer:
+        servers:
+        - url: http://127.0.0.1:8080/
+        passHostHeader: true
