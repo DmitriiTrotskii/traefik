@@ -72,7 +72,7 @@ user:$apr1$zvd7ilq2$4vbvE2rE96X.xyvRpO.ih.
 ##  Запуск
 
 ```bash
-docker node update --label-add traefik=true         # Добавить lable на нодну, на этой недле будет запущен контейнер
-docker network create traefik-network -d overlay    # Создать сеть
-docker stack deploy traefik -c traefik-swarm.yml    # Запустить сервис
+docker node update --label-add traefik=true NODE-NAME   # Добавить lable, на этой ноде будет запущен контейнер
+docker network create traefik-network -d overlay        # Создать сеть
+docker stack deploy traefik -c traefik-swarm.yml        # Запустить сервис
 ```
